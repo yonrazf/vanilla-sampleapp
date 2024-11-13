@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Title</title>
+    <style>
+      button {
+        border-radius: 4px;
+        background: dodgerblue;
+        color: white;
+        border: 0;
+        padding: 8px 16px;
+      }
+    </style>
+    <script
+      type="application/javascript"
+      src="https://cdn.jsdelivr.net/npm/@frontegg/js@6.191.0-alpha.1/umd/frontegg.production.min.js"
+    ></script>
+  </head>
+  <body>
+    <div id="app-root" style="display: none">
+      <h1>This is Frontegg Integration in Vanilla Javascript</h1>
+      <div id="user-container"></div>
+      <br />
+      <a fe-state="isAuthenticated" href="account/logout"
+        ><button>Logout</button></a
+      >
+      <a fe-mode="embedded" fe-state="!isAuthenticated" href="/account/login"
+        ><button>Login</button></a
+      >
+    </div>
+    <!-- <script type="text/javascript" src="dist/bundle.js"></script> -->
+    <script type="text/javascript">
+      const app = Frontegg.initialize({
+        contextOptions: {
+          baseUrl: "https://app-kcj0djtbjuee.frontegg.com",
+          clientId: "a0fff686-59cd-4498-a5da-ef7def2a1613",
+          appId: "a9ca748a-ae1f-468b-9f76-ca9f05b6fcb7",
+        },
+        hostedLoginBox: false, //if you are working in embedded mode remove this one
+      });
+
+      app.ready(() => {
+        console.log("App is ready");
+        /**
+         * Uncomment below code for automatic login
+         */
+        let unsubscribe = app.store.subscribe(() => {
+          const { auth } = app.store.getState();
+          if (!auth.isLoading) {
+            unsubscribe();
+            // if (!auth.isAuthenticated) {
+            //   app.loginWithRedirect();
+            // }
+          }
+        });
+      });
+
+      // document
+      //   .querySelector('[fe-action="open-admin-portal"]')
+      //   .addEventListener("click", () => {
+      //     app.showAdminPortal();
+      //   });
+
+      // document
+      //   .getElementById("loginWithRedirect")
+      //   .addEventListener("click", () => {
+      //     app.loginWithRedirect();
+      //   });
+
+      // document
+      //   .getElementById("hostedLoginLogout")
+      //   .addEventListener("click", () => {
+      //     app.logout();
+      //   });
+
+      // document.getElementById("testt").addEventListener('click', () => {
+      //     console.log("asd!");
+      // });
+      // document.getElementById("testt").addEventListener("click", () => {
+      //   console.log(app.store.getState());
+      // });
+
+      // let selectedTenant = null;
+      // function handleSwitchTenant(event) {
+      //   selectedTenant = event.target.value;
+      //   console.log("Selected tenant:", selectedTenant);
+      //   // Add your desired functionality here
+      //   // app.store.dispatch({ type: 'auth/switchTenant', payload: { tenantId: selectedTenant } });
+      //   app.switchTenant({
+      //     tenantId: selectedTenant,
+      //     callback: (isSuccess) => console.log(isSuccess),
+      //   });
+      //   // auth.actions.switchTenant(selectedTenant);
+      // }
+      // const tenants = [
+      //   { tenantId: "854df473-17a8-42f1-bdfa-d88d6c1bf1fc", name: "Tenant 1" },
+      //   { tenantId: "eb399604-647b-4a8a-9098-12185cef964d", name: "Tenant 2" },
+      //   { tenantId: "aaa5b1f4-0007-4c43-8504-6b92a76f4c5f", name: "Tenant 3" },
+      // ];
+
+      // // Get the container element
+      // const container = document.getElementById("selectContainer");
+
+      // // Create the <select> element
+      // const selectElement = document.createElement("select");
+      // selectElement.className = "button";
+      // selectElement.addEventListener("change", handleSwitchTenant);
+
+      // // Create a default option
+      // const defaultOption = document.createElement("option");
+      // defaultOption.value = "";
+      // defaultOption.text = "Select a tenant";
+      // selectElement.add(defaultOption);
+
+      // // Loop through the tenants and create <option> elements
+      // tenants.forEach((tenant, index) => {
+      //   const optionElement = document.createElement("option");
+      //   optionElement.value = tenant.tenantId;
+      //   optionElement.text = tenant.name;
+      //   selectElement.add(optionElement);
+      // });
+
+      // // Append the <select> element to the container
+      // container.appendChild(selectElement);
+
+      const style = document.createElement("style");
+      style.setAttribute("type", "text/css");
+      style.innerHTML = "";
+      document.getElementsByTagName("head")[0].appendChild(style);
+
+      app.store.subscribe(() => {
+        const state = app.store.getState();
+        document.getElementById("app-root").style.display = state.auth.isLoading
+          ? "hidden"
+          : "block";
+
+        if (state.auth.user) {
+          document.getElementById("user-container").innerText =
+            state.auth.user.email;
+        } else {
+          document.getElementById("user-container").innerText =
+            "Not Authenticated";
+        }
+
+        let styleHtml = "";
+        if (state.auth.isAuthenticated) {
+          styleHtml += '[fe-state="isAuthenticated"] { }';
+          styleHtml += '[fe-state="!isAuthenticated"] { display: none; }';
+        } else {
+          styleHtml += '[fe-state="isAuthenticated"] { display: none; }';
+          styleHtml += '[fe-state="!isAuthenticated"] { }';
+        }
+        console.log(app.options);
+
+        if (app.options.hostedLoginBox) {
+          styleHtml += '[fe-mode="hosted"] { }';
+          styleHtml += '[fe-mode="embedded"] { display: none; }';
+        } else {
+          styleHtml += '[fe-mode="hosted"] { display: none; }';
+          styleHtml += '[fe-mode="embedded"] { }';
+        }
+        style.innerHTML = styleHtml;
+      });
+    </script>
+  </body>
+</html>
